@@ -3,37 +3,53 @@ from django.db import models
 # Create your models here.
 
 
+class Author(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
-    id = models.AutoField(primary_key=True)
-    author = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    datetime = models.TimeField()
-    price = models.IntegerField()
+    # Продукт может принадлежать только одному автору
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    date_and_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
 
 
-class Lesson(models.Model):
-    id = models.AutoField(primary_key=True)
-    # У одного продукта может быть много уроков
-    product_key = models.ForeignKey('Product', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    videolink = models.URLField()
+class Lession(models.Model):
+    # Урок может принадлежать только одному продукту
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    video_link = models.URLField()
+
+    def __str__(self):
+        return self.name
 
 
 class Group(models.Model):
-    id = models.AutoField(primary_key=True)
-    # Один продукт может включать в себя много групп
-    product_id = models.ForeignKey('Product', on_delete=models.CASCADE)
+    # Группа может принадлежать только к одному продукту
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     min_users = models.IntegerField()
     max_users = models.IntegerField()
-    name = models.CharField(max_length=100)
-    # Одна группа может включать в себя много студентов
-    students = models.ForeignKey('Students', on_delete=models.CASCADE)
+    # В группе может быть много студентов
+    students = models.ManyToManyField('Student')
+
+    def __str__(self):
+        return self.name
 
 
-class Students(models.Model):
-    id = models.AutoField(primary_key=True)
-    fname = models.CharField(max_length=30)
-    sname = models.CharField(max_length=30)
-    username = models.CharField(max_length=15)
-    # Студент может быть только в одной группе
-    group_id = models.OneToOneField('Group', on_delete=models.CASCADE)
+class Student(models.Model):
+    fname = models.CharField(max_length=100)
+    sname = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, unique=True)
+    # Студент может быть во множестве групп
+    groups = models.ManyToManyField('Group')
+
+    def __str__(self):
+        return self.username
