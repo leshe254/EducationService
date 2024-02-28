@@ -38,7 +38,7 @@ class Group(models.Model):
     min_users = models.IntegerField()
     max_users = models.IntegerField()
     # В группе может быть много студентов, а так же может быть открыт набор в группы
-    students = models.ManyToManyField('Student', blank=True, null=True)
+    students = models.ManyToManyField('Student', blank=True)
 
     def __str__(self):
         return self.name
@@ -49,7 +49,7 @@ class Student(models.Model):
     sname = models.CharField(max_length=100)
     username = models.CharField(max_length=100, unique=True)
     # Студент может быть во множестве групп, а так же может и не состоять в группе
-    groups = models.ManyToManyField('Group', blank=True, null=True)
+    groups = models.ManyToManyField('Group', blank=True)
 
     def __str__(self):
         return self.username
